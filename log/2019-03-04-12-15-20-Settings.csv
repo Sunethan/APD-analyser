@@ -1,0 +1,10 @@
+MeshList,Regions,MeshLineSet,MeshLinePosition,ConcentrationData,DefaultConcs,DefaultInterface,DefaultInterfacePosition,Vnumbers,Vmeshlines,OtherSettings,Info,InfoValue,Plot,Value
+200,Neutral p++,P-Line 1,-4.4822816398716405,M-layer(Max),9.90e+15,InP / InGaAsP,-3.6,40,0,-4.472301829318819,No.,81,Xarray,2.31e17
+400,(p++) M-Layer,P-Line 2,-4.41508471993582,Charge layer,1.45e+17,InGaAsP / InGaAs,-3.5,40,20,-4.31,Node,1277,Yarray,22.3
+300,(p+) M-Layer,(p+) / (n-) M-Layer,-4.2978878,Grading layer,0.00e+00,InGaAs / InP,-0.5,30,30,2.0,Ring(Y/N),No,,
+100,(n-) M-Layer,(n-) M-Layer / Charge,-3.7730639,Absorption layer,1.00e+15,,,30,40,43.66,Form(M/P),Mesa,,
+200,Charge layer,Charge / Grading,-3.60930625,Buffer layer,5.00e+17,,,30,50,0.025,Nd(cm-3),9.90e+15,,
+200,Grading layer,Grading / Absorption,-3.4599981,,,,,,65,13,Nc(cm-3),1.45e+17,,
+100,Absorption layer,N-Line 1,-2.427,,,,,,,0.002,Vpt,22.78,,
+1000,Buffer layer,N-Line 2,-1.575,,,,,,,2000,Vb,43.66,,
+200,Substrate,,,,,,,,,,OtherInfo.,None,,
