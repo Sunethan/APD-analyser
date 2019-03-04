@@ -1,4 +1,5 @@
 # APD-analyser
+## 程式功能、目的
 這是專門用來模擬作為單光子偵測器之雪崩光電二極體元件的程式。目前預設的結構為一維 InP/InGaAsP/InGaAs 的 SAM-APD 結構，裡頭的參數皆參考自諸多論文，目前尚未有時間整理這些模擬參數的由來，有興趣了解者可以再跟我聯繫。因為時間有限，所以還有功能尚未很齊全，但基本上可以做如下模擬：
 
 1. 輸入任意的摻質濃度分佈。
@@ -12,3 +13,15 @@
 
 4. 尋找發生雪崩崩潰的電壓值（avalanche breakdown voltage）
 基本上是透過倍增積分（multiplication integral）是否等於一來判斷是否已達崩潰。
+
+## 檔案結構
+main.py：主要的 tkinter 執行檔
+physfunc.py：所有物理模型與相關計算的檔案
+defaults.csv：開啟程式時所載入的預設值，主要是最近一次模擬時於各欄位（tk.entry）中的數值。
+VbLog.csv：「顯示崩潰電壓運算結果」的暫存檔
+VptLog.csv：「顯示擊穿電壓運算結果」的暫存檔
+log/Allsaved.csv：「每次模擬紀錄的各欄位數值」路徑檔
+log/Statistics.csv：顯示於統計列表的內容
+log/TempStatistics.csv：更新統計列表之暫存檔
+log/2019-mm-dd-hh-mm-ss-Settings.csv：該次模擬紀錄檔
+Sample_DopingProfile/DopingProfile_Total.csv：摻質濃度分佈範例檔
