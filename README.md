@@ -15,7 +15,7 @@
 4. 尋找發生雪崩崩潰的電壓值（avalanche breakdown voltage）
 > 基本上是透過倍增積分（multiplication integral）是否等於一來判斷是否已達崩潰。
 
-## 檔案結構
+## 結構
 * main.py：主要的 tkinter 執行檔
 * physfunc.py：所有物理模型與相關計算的檔案
 * defaults.csv：開啟程式時所載入的預設值，主要是最近一次模擬時於各欄位（tk.entry）中的數值。
