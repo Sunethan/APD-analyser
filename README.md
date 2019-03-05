@@ -22,6 +22,8 @@
 4. 尋找發生雪崩崩潰的電壓值（avalanche breakdown voltage）
 > 基本上是透過倍增積分（multiplication integral）是否等於一來判斷是否已達崩潰。
 
+![image](<a href="https://www.codecogs.com/eqnedit.php?latex=1-1/M_n=\int_{r_p}^{r_n}\alpha(E)\exp\{-\int_{r_p}^r\left[\alpha(E)-\beta(E)&space;\right&space;]dr^\prime\}dr" target="_blank"><img src="https://latex.codecogs.com/gif.latex?1-1/M_n=\int_{r_p}^{r_n}\alpha(E)\exp\{-\int_{r_p}^r\left[\alpha(E)-\beta(E)&space;\right&space;]dr^\prime\}dr" title="1-1/M_n=\int_{r_p}^{r_n}\alpha(E)\exp\{-\int_{r_p}^r\left[\alpha(E)-\beta(E) \right ]dr^\prime\}dr" /></a>)
+
 ## 結構
 * main.py：主要的 tkinter 執行檔
 * physfunc.py：所有物理模型與相關計算的檔案
