@@ -39,3 +39,7 @@
 * 因為還沒有設計藉由輸入之二維摻質濃度並自動求出曲率半徑的演算法，所以〈Breakdown voltage〉的 Cylindrical 按鈕沒有效果。
 * 無法不透過重新計算擊穿或崩潰電壓來更新〈Statstics〉中的統計資料列表。
 * 擊穿 InP/InGaAsP 界面與 InGaAsP/InGaAs 界面之擊穿電壓並不相同，雖然有顯示於左下之〈Variable History〉欄位中（Vpt 與 Vpt2），但並不會將 Vpt2 更新於統計列表中。
+
+## Bug
+
+* 更新下一個檔案再畫 depletion width 時，會出現 IndexError: list assignment index out of range
