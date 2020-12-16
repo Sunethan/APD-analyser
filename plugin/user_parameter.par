@@ -1,0 +1,1165 @@
+## Revise record
+## 2018/12/02 11:10 Scharfetter, InGaAs values
+## 2018/12/02 13:55 Hurkx TAT model, set all mt values 0.25
+## 2018/12/02 14:15 Edit Scharfetter @ Multiplication layer
+## 2018/12/03 01:16 Add mobility of InGaAs dependence on doping
+## 2018/12/03 09:57 Add mobility of InP dependence on doping
+## 2018/12/07 10:11 Add mobility of InGaAsP dependence on doping
+## 2018/12/07 10:12 Add mobility of grading layer dependence on doping (InGaAsP)
+## 2018/12/07 11:15 Add mobility of grading layer dependence on electric field (InGaAsP)
+## 2018/12/16 14:24 Edit Scharfetter model parameters of InP and multiplication region
+## 2018/12/16 18:16 Edit Scharfetter model parameters of InGaAs
+## 2018/12/17 00:28 Edit Scharfetter model parameters of InGaAsP
+## 2019/01/20 16:42 Add Thermal diffusion model of InP, InGaAs and InGaAsP
+## 2019/01/20 22:45 Add trap level of InP
+## 2019/01/22 01:27 Add trap level of InGaAs
+## 2019/04/10 Edit bandgap parameter and tunneling model parameters of InGaAs
+##------------ Region parameter ------------
+#Region="Absorption" {
+#	Scharfetter * relation and trap level for SRH recombination:
+#	{	
+#		Etrap	= @Eti@	# [eV] 0.157 eV might be reasonable
+#	}
+#}
+Region="Multiplication" {
+	Scharfetter * relation and trap level for SRH recombination:
+	{	* tau = taumin + ( taumax - taumin ) / ( 1 + ( N/Nref )^gamma)
+		* tau(T) = tau * ( (T/300)^Talpha )          (TempDep)
+		* tau(T) = tau * exp( Tcoeff * ((T/300)-1) ) (ExpTempDep)
+		taumin	= 9.00e-9 ,	1.50e-9	# [s]
+		taumax	= 3.15e-7 ,	5.50e-7	# [s]
+		Nref	= 3.7000e+17 ,	4.0000e+15	# [cm^(-3)]
+		gamma	= 1.7 ,	2.2	# [1]
+		Talpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Tcoeff	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Etrap	= 0.0000e+00	# [eV]
+	}
+	# The following data is the property of InP
+	vanOverstraetendeMan * Impact Ionization:
+	{	* G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+		* with alpha = gamma a  exp(-b gamma/E) for E<E0 (low) and E>E0 (high)
+		*  with gamma = tanh(hbarOmega/(2kT0)) / tanh(hbarOmega/(2kT))
+		a(low)	= 1.12e+7 ,	4.79e+6	# [1/cm]
+		a(high)	= 2.93e+6 ,	1.62e+6	# [1/cm]
+		b(low)	= 3.11e+6 ,	2.55e+6	# [V/cm]
+		b(high)	= 2.64e+6 ,	2.11e+6    # [V/cm]
+		E0	= 3.8000e+05 ,	3.8000e+05	# [V/cm]
+		hbarOmega	= 0.063 ,	0.063	# [eV]
+	}
+}
+## Reference : [1] Modelling of Interface Carrier Transport for Device Simulation
+RegionInterface = "Multiplication/Grading"{
+	ThermionicEmission {
+		A = 2, 2 #[1]
+		B = 4, 4 #[1]
+		C = 1, 1 #[1]
+	}
+}
+Region="Grading" {
+	DopingDependence:
+	{
+		# InGaAsP (y = 0.70) at 300 K
+		# Electron mobility Reference: 
+		# NSM Archive http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/hall.html
+		# T.P.Pearsall,  GaInAsP Alloy Semiconductors, John Wiley and Sons, 1982.
+		# Hole mobility Reference: 
+		# NSM Archive http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/hall.html
+		# K.Tappura, J. Appl. Phys., 74, no. 7, pp.4565-4570 (1993).
+  * For doping dependent mobility model three formulas
+  * can be used. Formula1 is based on Masetti et al. approximation.
+  * Formula2 uses approximation, suggested by Arora.
+	formula	= 2 ,	2	# [1]
+  * If formula=2, model suggested by Arora is used:
+  * mu_dop = muminA + mudA/(1.+(N/N00)^AA),
+  * where muminA=Ar_mumin*(T/T0)^Ar_alm; mudA = Ar_mud*(T/T0)^Ar_ald
+  * N is net doping
+  * N00=Ar_N0*(T/T0)^Ar_alN; AA = Ar_a*(T/T0)^Ar_ala
+	Ar_mumin	= 6.0000e+03 ,	5.0000e+03	# [cm^2/Vs]
+	Ar_alm  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_mud  	= 0.0000e+00 ,	0.0000e+00	# [cm^2/Vs]
+	Ar_ald  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_N0   	= 1.0000e+16 ,	1.0000e+16	# [cm^(-3)]
+	Ar_alN  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_a    	= 1.0000e+00 ,	1.0000e+00	# [1]
+	Ar_ala  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	}
+	Band2BandTunneling {
+		RPath2 = 1.27
+		PPath2 = 0
+		DPath2=0
+		APath2=1.81e+20
+		BPath2=5.866e+6
+		RPath =  1.27
+		PPath = 0
+		DPath=0
+		APath=1.81e+20
+		BPath=5.866e+6
+		Agen= 1.817e+20	# [1/cm^3/sec]
+		Bgen= 10.14e+6	# [V/cm]
+		Pgen= 2	# [1]
+		Arec= 1.817e+20	# [1/cm^3/sec]
+		Brec= 10.14e+6	# [V/cm]
+		Prec= 2	# [1]
+		alpha= 0	# [1]
+	}
+	ConstantMobility:
+	{	* mu_const = mumax (T/T0)^(-Exponent)
+		* Mole fraction dependent model.
+		* If only constant parameters are specified, those values will be
+		* used for any mole fraction instead of the interpolation below.
+		* Linear interpolation is used on the interval [0,1].
+		Exponent	= 1.514,	1.66	#[1]
+		mumax	= 9250,	235	#[cm^2/(Vs)]
+		mutunnel	= 0.05,	0.05	#[cm^2/(Vs)]
+	}
+	HighFieldDependence:
+	# For InGaAsP grading layer
+	{	* Caughey-Thomas model:
+		* mu_highfield = ( (alpha+1)*mu_lowfield ) / 
+		*        ( alpha + ( 1 + ( (alpha+1)*mu_lowfield*E/vsat)^beta )^(1/beta) ) 
+		* beta = beta0 (T/T0)^betaexp.
+		beta0	= 2 ,	2	# [1]
+		betaexp	= 0.0000e+00 ,	0.0000e+00	# [1]
+		alpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+		
+		* Smoothing parameter for HydroHighField Caughey-Thomas model:
+		* if Tl < Tc < (1+K_dT)*Tl, then smoothing between low field mobility
+		* and HydroHighField mobility is used.
+		K_dT	= 0.2 ,	0.2	# [1]
+		
+		* Transferred-Electron Effect:
+		* mu_highfield = (mu_lowfield+(vsat/E)*(E/E0_TrEf)^4)/(1+(E/E0_TrEf)^4)
+		E0_TrEf	= 4.0000e+03 ,	4.0000e+03	# [1]
+		Ksmooth_TrEf	= 20 ,	20	# [1]
+		
+		* For vsat either Formula1 or Formula2 can be used.
+		Vsat_Formula	= 1 ,	1	# [1]
+		vsat0	= 0.8e+07 ,	0.625e+07		#[cm/s]
+		vsatexp	= 0.0000e+00,	0.0000e+00	#[1]
+
+		* Formula2 for saturation velocity:
+		*            vsat = A_vsat - B_vsat*(T/T0)
+		* (Parameter Vsat_Formula has to be equal to 2)
+		A_vsat	= 1.21800e+07 ,	0.782000e+07	# [1]
+		B_vsat	= 0.0000e+00 ,	0.0000e+00	# [1]
+		vsat_min	= 0.0000 ,	0.0000	# [1]
+	}
+	vanOverstraetendeMan * Impact Ionization:
+	{	* G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+		* with alpha = gamma a  exp(-b gamma/E) for E<E0 (low) and E>E0 (high)
+		*  with gamma = tanh(hbarOmega/(2kT0)) / tanh(hbarOmega/(2kT))
+		a(low)	= 6735000 ,	4370000	# [1/cm]
+		a(high)	= 2600000 ,	2785000	# [1/cm]
+		b(low)	= 2120000 ,	2000000	# [V/cm]
+		b(high)	=1885000 ,	1780000# [V/cm]
+		E0	= 3.8000e+05 ,	3.8000e+05	# [V/cm]
+		hbarOmega	= 0.063 ,	0.063	# [eV]
+	}
+	ComplexRefractiveIndex
+	{	*  Complex refractive index model: n_complex = n + i*k (unitless)
+		*  
+		*  with n = n_0 + delta_n_lambda + delta_n_T + delta_n_carr + delta_n_gain 
+		*       k = k_0 + delta_k_lambda             + delta_k_carr                
+		
+		* Base refractive index and extinction coefficient: 
+		*     n_0, k_0 
+		
+		* Wavelength dependence (real and imag): 
+		*     Formula 0: delta_n_lambda = Cn_lambda * lambda + Dn_lambda * lambda^2 
+		*                delta_k_lambda = Ck_lambda * lambda + Dk_lambda * lambda^2 
+		*     Formula 1: Read tabulated values 
+		*                NumericalTable (...)  
+		*     Formula 2: Read tabulated values from file 
+		*                NumericalTable = <string> 
+		
+		* Temperature dependence (real): 
+		*     delta_n_T = n_0 * ( Cn_temp * (T-Tpar)) 
+		
+		* Carrier dependence (real) 
+		*     delta_n_carr = - Cn_carr * (const.) * (n/m_e + p/m_h) 
+		
+		* Carrier dependence (imag) 
+		*     delta_k_carr = 1 / (4*PI) * (wavelength^Gamma_k_carr_e*Ck_carr_e*n + wavelength^Gamma_k_carr_h*Ck_carr_h*p) 
+		
+		* Gain dependence (real) 
+		*     lin: delta_n_gain = Cn_gain * ( (n+p)/(2 * Npar) - 1) 
+		*     log: delta_n_gain = Cn_gain * log ( (n+p)/(2 * Npar ) )
+		n_0	= 3.892	# [1]
+		k_0	= 0.0	# [1]
+		Cn_lambda	= 0.0000e+00	# [um^-1]
+		Dn_lambda	= 0.0000e+00	# [um^-2]
+		Ck_lambda	= 0.0000e+00	# [um^-1]
+		Dk_lambda	= 0.0000e+00	# [um^-2]
+		Cn_temp	= 2.0000e-04	# [K^-1]
+		Cn_carr= 1	# [1]
+		Cn_gain	= 0.0000e+00	# [1]
+		Npar	= 1.0000e+18	# [cm^-3]
+	
+		* Mole fraction dependent model.
+		* Linear interpolation is used on the interval [0,1].
+		Ck_carr	= 0.0000e+00,	0.0000e+00	#[cm^2]
+		Gamma_k_carr	= 1,	1	#[1]
+		Formula = 0
+		Tpar	= 3.0000e+02	# [K]
+	} 
+}
+## Reference : [1] Modelling of Interface Carrier Transport for Device Simulation
+RegionInterface = "Grading/Absorption"{
+	ThermionicEmission {
+		A = 2, 2 #[1]
+		B = 4, 4 #[1]
+		C = 1, 1 #[1]
+	}
+}
+## Reference : [1] Modelling of Interface Carrier Transport for Device Simulation
+RegionInterface = "Absorption/Substrate"{
+	ThermionicEmission {
+		A = 2, 2 #[1]
+		B = 4, 4 #[1]
+		C = 1, 1 #[1]
+	}
+}
+##------------ Material parameter ------------
+Material="InGaAsP" {
+	Band2BandTunneling {
+	* Traditional models for the following keywords in input file:
+	* Band2Band(E1)  : A1*E*exp(-B1/E)
+	* Band2Band(E1_5): A1_5*E^1.5*exp(-B1_5/E)
+	* Band2Band(E2)  : A2*E^2*exp(-B2/E)
+	# [1] models_Si.par
+	# [2] Ando1980 Eq.(1), C.B.Duke (1969) Eq.(13.1), John L. Moll (1970) Eq.(12-53)
+		A1	= 1.1000e+27	# [1/cm^2/sec/V]	[1]
+		B1	= 2.1300e+07	# [V/cm]	[1]
+		A1_5= 1.9000e+24	# [1/cm^1.5/sec/V^1.5]	[1]
+		B1_5= 2.1900e+07	# [V/cm]	[1]
+		A2	= 7.327e+19	# [1/cm/sec/V^2] [2]
+		B2	= 8.491e+6	# [V/cm] [2]
+	
+	  * Hurkx model for the following keywords in input file:
+	  * Band2Band(Hurkx)  : -Agen*D*(E/E0)^Pgen*exp(-Bgen*(Eg/Eg300)^1.5/E) if D < 0
+	  *                     -Arec*D*(E/E0)^Prec*exp(-Brec*(Eg/Eg300)^1.5/E) if D > 0
+	  *                     D = (n*p-ni^2)/(n+ni)/(p+ni)*(1-|alpha|)+alpha, E0 = 1 V/cm
+	  *                     So, if alpha = 0, it's original Hurkx model,
+	  *                         if alpha = -1, it's only generation,
+	  *                         if alpha = +1, it's only recombination.
+	  	Agen = 7.327e+19	# [1/cm^3/sec] ; Default 1.785e+20
+		Bgen = 8.491e+6	# [V/cm] ; Default 6.188e+6
+		Pgen = 2	# [1] ; Default 2
+		Arec	= 7.327e+19	# [1/cm^3/sec]
+		Brec	= 8.491e+6		# [V/cm]
+		Prec	= 2	# [ 1]
+		alpha= 0.0000e+00	# [1]
+		
+	 * nonlocal B2B models for the following keywords in command file:
+	 * Band2Band(Model=NonlocalPath) : Nonlocal B2B tunneling with transition process using the tunneling path
+	 * For the nonlocal B2B process:
+	 * Apath : Prefactor Ad or Ap in the uniform field limit for the direct or indirect tunneling
+	 * Bpath : Exponent  Bd or Bp in the uniform field limit for the direct or indirect tunneling
+	 * Cpath : Factor g*Dop^2/rho for indirect tunneling
+	 * Dpath : The conduction band offset D
+	 * Ppath : The phonon energy P
+	 *         Note that the indirect tunneling process is assumed if P>0, and the direct tunneling process is assumed if P=0
+	 * Rpath : The ratio mv/mc. If Rpathi=0, it is automatically determined by
+	 *         mv/mc = (1 + 2*mr)/(1 - 2*mr)
+	 *         where mr=mc*mv/(mc+mv) is the reduced mass
+	 * g     : Degeneracy factor
+	 * m_c   : Effective mass in the conduction band
+	 * m_v   : Effective mass in the valence band
+	 * In the uniform field limit, the generation rate can be expressed by
+	 * G = A * (F/F0)^2   * Exp(-B/F) for   direct tunneling
+	 *   = A * (F/F0)^2.5 * Exp(-B/F) for indirect tunneling
+	 * where
+	 * Ad = g * mr^0.5 * (qF0)^2 / (36 * pi * h_bar^2 *E_T^0.5)
+	 * Ap = g *(mc*mv)^1.5 * (1+2*N) * (qF0)^2.5 * Dop^2 / (2^7.75 * pi^2.5 * h_bar^2.5 * mr^1.25 * E_T^1.75 * rho * P)
+	 * Bd = pi    * mr^0.5 * E_T^1.5 / (2 * h_bar * q)
+	 * Bp = 2^2.5 * mr^0.5 * E_T^1.5 / (3 * h_bar * q)
+	 * F0 = 1 V/cm, qF0 = 1 eV/cm, E_T = E_G + D
+	 * For the paramter set (APath, Bpath, Dpath, Ppath, Rpath), the microscopic parameters such as mr, mc, and mv for the nonlocal B2B model are extracted internally.   * For the parameter set (Cpath, g, m_c, m_v), the microscopic parameters are used directly for the tunneling rate computation.
+  		APath=1.81e+20
+		BPath=5.866e+6
+		DPath=0
+		PPath = 0
+		RPath =  1.27
+		
+	* Unknown model parameters
+		APath2=1.81e+20
+		BPath2=5.866e+6
+		DPath2=0
+		PPath2 = 0
+		RPath2 = 1.27
+	}
+	ThermalDiffusion
+	{ *  Thermal diffusion factor, td: td*mu*kB*N*grad(T), td=0 for Stratton model
+		*  Carrier diffusion factor, td_g: mu*kB*(td_g*Tcarrier + (1-td_g)*Tlattice)*grad(N)
+		td_n	= 0.0000e+00	# [1]
+		td_p	= 0.0000e+00	# [1]
+		td_gn	= 1	# [1]
+		td_gp	= 1	# [1]
+	}
+	HighFieldDependence:
+	# For InGaAsP grading layer
+	{	* Caughey-Thomas model:
+		* mu_highfield = ( (alpha+1)*mu_lowfield ) / 
+		*        ( alpha + ( 1 + ( (alpha+1)*mu_lowfield*E/vsat)^beta )^(1/beta) ) 
+		* beta = beta0 (T/T0)^betaexp.
+		beta0	= 2 ,	2	# [1]
+		betaexp	= 0.0000e+00 ,	0.0000e+00	# [1]
+		alpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+		
+		* Smoothing parameter for HydroHighField Caughey-Thomas model:
+		* if Tl < Tc < (1+K_dT)*Tl, then smoothing between low field mobility
+		* and HydroHighField mobility is used.
+		K_dT	= 0.2 ,	0.2	# [1]
+		
+		* Transferred-Electron Effect:
+		* mu_highfield = (mu_lowfield+(vsat/E)*(E/E0_TrEf)^4)/(1+(E/E0_TrEf)^4)
+		E0_TrEf	= 4.0000e+03 ,	4.0000e+03	# [1]
+		Ksmooth_TrEf	= 20 ,	20	# [1]
+		
+		* For vsat either Formula1 or Formula2 can be used.
+		Vsat_Formula	= 1 ,	1	# [1]
+		vsat0	= 0.8e+07 ,	0.625e+07		#[cm/s]
+		vsatexp	= 0.0000e+00,	0.0000e+00	#[1]
+
+		* Formula2 for saturation velocity:
+		*            vsat = A_vsat - B_vsat*(T/T0)
+		* (Parameter Vsat_Formula has to be equal to 2)
+		A_vsat	= 1.21800e+07 ,	0.782000e+07	# [1]
+		B_vsat	= 0.0000e+00 ,	0.0000e+00	# [1]
+		vsat_min	= 0.0000 ,	0.0000	# [1]
+	}
+	DopingDependence:
+	{
+		# InGaAsP (y = 0.70) at 300 K
+		# Electron mobility Reference: 
+		# NSM Archive http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/hall.html
+		# T.P.Pearsall,  GaInAsP Alloy Semiconductors, John Wiley and Sons, 1982.
+		# Hole mobility Reference: 
+		# NSM Archive http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/hall.html
+		# K.Tappura, J. Appl. Phys., 74, no. 7, pp.4565-4570 (1993).
+  * For doping dependent mobility model three formulas
+  * can be used. Formula1 is based on Masetti et al. approximation.
+  * Formula2 uses approximation, suggested by Arora.
+	formula	= 2 ,	2	# [1]
+  * If formula=2, model suggested by Arora is used:
+  * mu_dop = muminA + mudA/(1.+(N/N00)^AA),
+  * where muminA=Ar_mumin*(T/T0)^Ar_alm; mudA = Ar_mud*(T/T0)^Ar_ald
+  * N is net doping
+  * N00=Ar_N0*(T/T0)^Ar_alN; AA = Ar_a*(T/T0)^Ar_ala
+	Ar_mumin	= 6.0000e+03 ,	5.0000e+03	# [cm^2/Vs]
+	Ar_alm  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_mud  	= 0.0000e+00 ,	0.0000e+00	# [cm^2/Vs]
+	Ar_ald  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_N0   	= 1.0000e+16 ,	1.0000e+16	# [cm^(-3)]
+	Ar_alN  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_a    	= 1.0000e+00 ,	1.0000e+00	# [1]
+	Ar_ala  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	}
+	# http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/optic.html
+	Epsilon
+	{
+		epsilon= 13.436
+	}
+	# Osaka 1984  In0.67Ga0.33As0.7P0.3 impact ionization coefficients
+	vanOverstraetendeMan * Impact Ionization:
+	{	* G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+		* with alpha = gamma a  exp(-b gamma/E) for E<E0 (low) and E>E0 (high)
+		*  with gamma = tanh(hbarOmega/(2kT0)) / tanh(hbarOmega/(2kT))
+		a(low)	= 9.051e+5 ,	4.755e+6	# [1/cm]
+		a(high)	= 9.051e+6 ,	4.755e+6	# [1/cm]
+		b(low)	= 1.733e+6 , 2.449e+06	# [V/cm]
+		b(high)	= 1.733e+6 , 2.449e+06# [V/cm]
+		E0	= 4.0000e+05 ,	4.0000e+05	# [V/cm]
+		hbarOmega	= 0.063 ,	0.063	# [eV]
+	}
+	Scharfetter * relation and trap level for SRH recombination:
+	{ 	* tau = taumin + ( taumax - taumin ) / ( 1 + ( N/Nref )^gamma)
+		* tau(T) = tau * ( (T/300)^Talpha )          (TempDep)
+		* tau(T) = tau * exp( Tcoeff * ((T/300)-1) ) (ExpTempDep)
+		taumin	= 0.5000e-09 ,	0.8500e-09	# [s]
+		taumax	= 1.0000e-05 ,  1.5000e-05	# [s]
+		Nref	= 1.0000e+17 ,	5.3000e+16	# [cm^(-3)]
+		gamma	= 2.0 ,	1.52	# [1]
+		Talpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Tcoeff	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Etrap	= 0.0000e+00	# [eV]
+	}
+	# Reference of mt value
+    # Hurkx et al., "A New Recombination Model for Device Simulation
+    # Including Tunneling", 1992.
+    # The mt value depends on experiment. 
+    # According to Hurkx(1992), mt = 0.25 seems plausible.
+	HurkxTrapAssistedTunneling{
+		mt=0.25,0.25
+	}
+	# Reference : http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/recombination.html#Recombination
+	RadiativeRecombination * coefficients:
+	{ * R_Radiative = C * (T/Tpar)^alpha * (n p - ni_eff^2)
+	   * C
+	   * alpha
+	   	C = 1.0e-10  # [cm^3/s]
+	   	alpha = 0 # []
+	}
+	# Reference : http://www.ioffe.ru/SVA/NSM/Semicond/GaInAsP/recombination.html#Recombination
+	Auger * coefficients:
+	{ * R_Auger = ( C_n n + C_p p ) ( n p - ni_eff^2)
+		* with C_n,p = (A + B (T/T0) + C (T/T0)^2) (1 + H exp(-{n,p}/N0))
+		A	= 3.1600e-30 ,	3.1600e-30	# [cm^6/s]
+		B	= 0.0000e+00 ,	0.0000e+00	# [cm^6/s]
+		C	= 0.0000e+00 ,	0.0000e+00	# [cm^6/s]
+		H	= 0.0000e+00 ,	0.0000e+00	# [1]
+		N0	= 1.0000e+18 ,	1.0000e+18	# [cm^(-3)]
+	}
+}
+Material="InGaAs" {
+	ThermalDiffusion
+	{ *  Thermal diffusion factor, td: td*mu*kB*N*grad(T), td=0 for Stratton model
+		*  Carrier diffusion factor, td_g: mu*kB*(td_g*Tcarrier + (1-td_g)*Tlattice)*grad(N)
+		td_n	= 0.0000e+00	# [1]
+		td_p	= 0.0000e+00	# [1]
+		td_gn	= 1	# [1]
+		td_gp	= 1	# [1]
+	}
+	DopingDependence:
+	{
+		# Reference: Chiang et al., “Lateral carrier diffusion and current 
+		# gain in terahertz InGaAs/InP double-heterojunction bipolar 
+		# transistors,” 2014.
+  * For doping dependent mobility model three formulas
+  * can be used. Formula1 is based on Masetti et al. approximation.
+  * Formula2 uses approximation, suggested by Arora.
+	formula	= 2 ,	2	# [1]
+  * If formula=2, model suggested by Arora is used:
+  * mu_dop = muminA + mudA/(1.+(N/N00)^AA),
+  * where muminA=Ar_mumin*(T/T0)^Ar_alm; mudA = Ar_mud*(T/T0)^Ar_ald
+  * N is net doping
+  * N00=Ar_N0*(T/T0)^Ar_alN; AA = Ar_a*(T/T0)^Ar_ala
+	Ar_mumin	= 1.6000e+03 ,	7.5000e+01	# [cm^2/Vs]
+	Ar_alm  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_mud  	= 1.0000e+04 ,	2.5600e+02	# [cm^2/Vs]
+	Ar_ald  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_N0   	= 2.1000e+17 ,	7.7000e+18	# [cm^(-3)]
+	Ar_alN  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_a    	= 0.7600e+00 ,	1.3700e+00	# [1]
+	Ar_ala  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	}
+	# The following references of radiative recombination have the same coefficients.
+	# Reference 1 : http://www.ioffe.ru/SVA/NSM/Semicond/GaInAs/electric.html
+	# Reference 2 : Chiang et al., Lateral carrier diffusion and current gain 
+	# in terahertz InGaAs/InP double-heterojunction bipolar transistors (2014)
+	RadiativeRecombination * coefficients:
+	{ * R_Radiative = C * (T/Tpar)^alpha * (n p - ni_eff^2)
+	   * C
+	   * alpha
+	   	C = 0.96e-10  # [cm^3/s]
+	   	alpha = 0 # []
+	}
+	# Reference : http://www.ioffe.ru/SVA/NSM/Semicond/GaInAs/electric.html
+	Auger * coefficients:
+	{ * R_Auger = ( C_n n + C_p p ) ( n p - ni_eff^2)
+	   * with C_n,p = (A + B (T/T0) + C (T/T0)^2) (1 + H exp(-{n,p}/N0))
+	   	A	= 7.0000e-29 ,	7.0000e-29	# [cm^6/s]
+	   	B	= 0.0000e+00 ,	0.0000e+00	# [cm^6/s]
+	   	C	= 0.0000e+00 ,	0.0000e+00	# [cm^6/s]
+	   	H	= 0.0000e+00 ,	0.0000e+00	# [1]
+	   	N0	= 1.0000e+18 ,	1.0000e+18	# [cm^(-3)]
+	}
+	Band2BandTunneling {
+	* Traditional models for the following keywords in input file:
+	* Band2Band(E1)  : A1*E*exp(-B1/E)
+	* Band2Band(E1_5): A1_5*E^1.5*exp(-B1_5/E)
+	* Band2Band(E2)  : A2*E^2*exp(-B2/E)
+	# [1] models_Si.par
+	# [2] Ando1980 Eq.(1), C.B.Duke (1969) Eq.(13.1), John L. Moll (1970) Eq.(12-53)
+		A1	= 1.1000e+27	# [1/cm^2/sec/V]	[1]
+		B1	= 2.1300e+07	# [V/cm]	[1]
+		A1_5= 1.9000e+24	# [1/cm^1.5/sec/V^1.5]	[1]
+		B1_5= 2.1900e+07	# [V/cm]	[1]
+		A2	= 7.271e+19	# [1/cm/sec/V^2] [2] # 1.446e+20
+		B2	= 5.24e+6		# [V/cm] [2]
+	
+	  * Hurkx model for the following keywords in input file:
+	  * Band2Band(Hurkx)  : -Agen*D*(E/E0)^Pgen*exp(-Bgen*(Eg/Eg300)^1.5/E) if D < 0
+	  *                     -Arec*D*(E/E0)^Prec*exp(-Brec*(Eg/Eg300)^1.5/E) if D > 0
+	  *                     D = (n*p-ni^2)/(n+ni)/(p+ni)*(1-|alpha|)+alpha, E0 = 1 V/cm
+	  *                     So, if alpha = 0, it's original Hurkx model,
+	  *                         if alpha = -1, it's only generation,
+	  *                         if alpha = +1, it's only recombination.
+	  	Agen = 7.271e+19	# [1/cm^3/sec] ; Default 1.785e+20
+		Bgen = 5.24e+6	# [V/cm] ; Default 6.188e+6
+		Pgen = 2	# [1] ; Default 2
+		Arec	= 7.271e+19	# [1/cm^3/sec]
+		Brec	= 5.24e+6		# [V/cm]
+		Prec	= 2	# [ 1]
+		alpha= 0.0000e+00	# [1]
+		
+	 * nonlocal B2B models for the following keywords in command file:
+	 * Band2Band(Model=NonlocalPath) : Nonlocal B2B tunneling with transition process using the tunneling path
+	 * For the nonlocal B2B process:
+	 * Apath : Prefactor Ad or Ap in the uniform field limit for the direct or indirect tunneling
+	 * Bpath : Exponent  Bd or Bp in the uniform field limit for the direct or indirect tunneling
+	 * Cpath : Factor g*Dop^2/rho for indirect tunneling
+	 * Dpath : The conduction band offset D
+	 * Ppath : The phonon energy P
+	 *         Note that the indirect tunneling process is assumed if P>0, and the direct tunneling process is assumed if P=0
+	 * Rpath : The ratio mv/mc. If Rpathi=0, it is automatically determined by
+	 *         mv/mc = (1 + 2*mr)/(1 - 2*mr)
+	 *         where mr=mc*mv/(mc+mv) is the reduced mass
+	 * g     : Degeneracy factor
+	 * m_c   : Effective mass in the conduction band
+	 * m_v   : Effective mass in the valence band
+	 * In the uniform field limit, the generation rate can be expressed by
+	 * G = A * (F/F0)^2   * Exp(-B/F) for   direct tunneling
+	 *   = A * (F/F0)^2.5 * Exp(-B/F) for indirect tunneling
+	 * where
+	 * Ad = g * mr^0.5 * (qF0)^2 / (36 * pi * h_bar^2 *E_T^0.5)
+	 * Ap = g *(mc*mv)^1.5 * (1+2*N) * (qF0)^2.5 * Dop^2 / (2^7.75 * pi^2.5 * h_bar^2.5 * mr^1.25 * E_T^1.75 * rho * P)
+	 * Bd = pi    * mr^0.5 * E_T^1.5 / (2 * h_bar * q)
+	 * Bp = 2^2.5 * mr^0.5 * E_T^1.5 / (3 * h_bar * q)
+	 * F0 = 1 V/cm, qF0 = 1 eV/cm, E_T = E_G + D
+	 * For the paramter set (APath, Bpath, Dpath, Ppath, Rpath), the microscopic parameters such as mr, mc, and mv for the nonlocal B2B model are extracted internally.   * For the parameter set (Cpath, g, m_c, m_v), the microscopic parameters are used directly for the tunneling rate computation.
+  		APath=1.81e+20
+		BPath=5.866e+6
+		DPath=0
+		PPath = 0
+		RPath =  1.27
+		
+	* Unknown model parameters
+		APath2=1.81e+20
+		BPath2=5.866e+6
+		DPath2=0
+		PPath2 = 0
+		RPath2 = 1.27
+	}
+	# Reference of mt value
+    # Hurkx et al., "A New Recombination Model for Device Simulation
+    # Including Tunneling", 1992.
+    # The mt value depends on experiment. 
+    # According to Hurkx(1992), mt = 0.25 seems plausible.
+	HurkxTrapAssistedTunneling{
+		mt=0.25,0.25
+	}
+	ComplexRefractiveIndex
+	{	*  Complex refractive index model: n_complex = n + i*k (unitless)
+		*  
+		*  with n = n_0 + delta_n_lambda + delta_n_T + delta_n_carr + delta_n_gain 
+		*       k = k_0 + delta_k_lambda             + delta_k_carr                
+  
+		* Base refractive index and extinction coefficient: 
+		*     n_0, k_0 
+  
+		* Wavelength dependence (real and imag): 
+		*     Formula 0: delta_n_lambda = Cn_lambda * lambda + Dn_lambda * lambda^2 
+		*                delta_k_lambda = Ck_lambda * lambda + Dk_lambda * lambda^2 
+		*     Formula 1: Read tabulated values 
+		*                NumericalTable (...)  
+		*     Formula 2: Read tabulated values from file 
+		*                NumericalTable = <string> 
+  
+		* Temperature dependence (real): 
+		*     delta_n_T = n_0 * ( Cn_temp * (T-Tpar)) 
+  
+		* Carrier dependence (real) 
+		*     delta_n_carr = - Cn_carr * (const.) * (n/m_e + p/m_h) 
+  
+		* Carrier dependence (imag) 
+		*     delta_k_carr = 1 / (4*PI) * (wavelength^Gamma_k_carr_e*Ck_carr_e*n + wavelength^Gamma_k_carr_h*Ck_carr_h*p) 
+  
+		* Gain dependence (real) 
+		*     lin: delta_n_gain = Cn_gain * ( (n+p)/(2 * Npar) - 1) 
+		*     log: delta_n_gain = Cn_gain * log ( (n+p)/(2 * Npar ) )
+		n_0(0)	= 3.892	# [1]
+		n_0(1)	= 3.892	# [1]
+		k_0(0)	= 0.19	# [1]
+		k_0(1)	= 0.19	# [1]
+		Cn_lambda(0)	= 0.0000e+00	# [um^-1]
+		Cn_lambda(1)	= 0.0000e+00	# [um^-1]
+		Dn_lambda(0)	= 0.0000e+00	# [um^-2]
+		Dn_lambda(1)	= 0.0000e+00	# [um^-2]
+		Ck_lambda(0)	= 0.0000e+00	# [um^-1]
+		Ck_lambda(1)	= 0.0000e+00	# [um^-1]
+		Dk_lambda(0)	= 0.0000e+00	# [um^-2]
+		Dk_lambda(1)	= 0.0000e+00	# [um^-2]
+		Cn_temp(0)	= 2.0000e-04	# [K^-1]
+		Cn_temp(1)	= 4.0000e-04	# [K^-1]
+		Cn_carr(0)	= 1	# [1]
+		Cn_carr(1)	= 1	# [1]
+		Cn_gain(0)	= 0.0000e+00	# [1]
+		Cn_gain(1)	= 0.0000e+00	# [1]
+		Npar(0)	= 1.0000e+18	# [cm^-3]
+		Npar(1)	= 1.0000e+18	# [cm^-3]
+		* Mole fraction dependent model.
+		* Linear interpolation is used on the interval [0,1].
+		Ck_carr(0)	= 0.0000e+00,	0.0000e+00	#[cm^2]
+		Ck_carr(1)	= 0.0000e+00,	0.0000e+00	#[cm^2]
+		Gamma_k_carr(0)	= 1,	1	#[1]
+		Gamma_k_carr(1)	= 1,	1	#[1]
+	        Formula = 0
+	        Tpar	= 3.0000e+02	# [K]
+	} 
+	Epsilon { 
+		*  Ratio of the permittivities of material and vacuum
+		* epsilon() = epsilon
+
+		# Reference: http://www.ioffe.ru/SVA/NSM/Semicond/GaInAs/optic.html
+		*	epsilon(0)	= 15.1	# [1]
+		*	epsilon(1)	= 12.9	# [1]
+		*	B(epsilon(1)) = 0.67 
+
+		# Reference: Adachi, Properties of Group-IV, III-V and II-VI 
+		# Semiconductors,John Wiley & Sons, Ltd, 2005.
+		epsilon(0)	= 14.3	# [1] 
+		epsilon(1)	= 12.9	# [1] 
+	}
+	# Capasso 1985 InGaAs impact ionization coefficients
+	vanOverstraetendeMan * Impact Ionization:
+	{	* G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+		* with alpha = gamma a  exp(-b gamma/E) for E<E0 (low) and E>E0 (high)
+		*  with gamma = tanh(hbarOmega/(2kT0)) / tanh(hbarOmega/(2kT))
+		a(low)	= 1.0e+9 ,	1.3e+8	# [1/cm]
+		a(high)	= 1.0e+9 ,	1.3e+8	# [1/cm]
+		b(low)	= 3.6e+06 , 2.7e+06	# [V/cm]
+		b(high)	=3.6e+06 , 2.7e+06 # [V/cm]
+		E0	= 4.0000e+05 ,	4.0000e+05	# [V/cm]
+		hbarOmega	= 0.063 ,	0.063	# [eV]
+	}
+	#vanOverstraetendeMan * Impact Ionization:
+	#{	* G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+	#	* with alpha = gamma a  exp(-b gamma/E) for E<E0 (low) and E>E0 (high)
+	#	*  with gamma = tanh(hbarOmega/(2kT0)) / tanh(hbarOmega/(2kT))
+	#	a(low)	= 2.2700e+06 ,	3.950e+06	# [1/cm]
+	#	a(high)	= 2.2700e+06 ,	3.9500e+06	# [1/cm]
+	#	b(low)	= 1.13e+06 ,	1.45e+06	# [V/cm]
+	#	b(high)	=1.13e+06 ,	1.45e+06# [V/cm]
+	#	E0	= 4.0000e+05 ,	4.0000e+05	# [V/cm]
+	#	hbarOmega	= 0.063 ,	0.063	# [eV]
+	#}
+	Bandgap
+	{	* Eg = Eg0 + alpha Tpar^2 / (beta + Tpar) - alpha T^2 / (beta + T)
+		* Parameter 'Tpar' specifies the value of lattice 
+		* temperature, at which parameters below are defined
+		* Chi0 is electron affinity.
+		Tpar	= 0	# [K] # default 3.0000e+2
+		* Mole fraction dependent model.
+		* If only constant parameters are specified, those values will be
+		* used for any mole fraction instead of the interpolation below.
+		* The following interpolation polynom can be used on interval [Xmin(I),Xmax(I)]:
+		* F(X) = F(I-1)+A(I)*(X-Xmin(I))+B(I)*(X-Xmin(I))^2+C(I)*(X-Xmin(I))^3,
+		* where Xmax(I), F(I), B(I), C(I) are defined below for each interval.
+		* A(I) is calculated for a boundary condition F(Xmax(I)) = F(I).
+		*
+		* Definition of mole fraction intervals, parameters, and coefficients:
+		* parameter dEg0(OldSlotboom):
+		Xmax(0)	= 0.0000e+00	# [1]
+		dEg0(OldSlotboom)(0)	= 0.0000e+00	# [eV]
+		Xmax(1)	= 1	# [1]
+		dEg0(OldSlotboom)(1)	= 0.0000e+00	# [eV]
+		B(dEg0(OldSlotboom)(1))	= 0.0000e+00	# [eV]
+		C(dEg0(OldSlotboom)(1))	= 0.0000e+00	# [eV]
+
+		* parameter dEg0(Slotboom):
+		Xmax(0)	= 0.0000e+00	# [1]
+		dEg0(Slotboom)(0)	= 0.0000e+00	# [eV]
+		Xmax(1)	= 1	# [1]
+		dEg0(Slotboom)(1)	= 0.0000e+00	# [eV]
+		B(dEg0(Slotboom)(1))	= 0.0000e+00	# [eV]
+		C(dEg0(Slotboom)(1))	= 0.0000e+00	# [eV]
+
+		* parameter dEg0(delAlamo):
+		Xmax(0)	= 0.0000e+00	# [1]
+		dEg0(delAlamo)(0)	= 0.0000e+00	# [eV]
+		Xmax(1)	= 1	# [1]
+		dEg0(delAlamo)(1)	= 0.0000e+00	# [eV]
+		B(dEg0(delAlamo)(1))	= 0.0000e+00	# [eV]
+		C(dEg0(delAlamo)(1))	= 0.0000e+00	# [eV]
+
+		* parameter dEg0(Bennett):
+		Xmax(0)	= 0.0000e+00	# [1]
+		dEg0(Bennett)(0)	= 0.0000e+00	# [eV]
+		Xmax(1)	= 1	# [1]
+		dEg0(Bennett)(1)	= 0.0000e+00	# [eV]
+		B(dEg0(Bennett)(1))	= 0.0000e+00	# [eV]
+		C(dEg0(Bennett)(1))	= 0.0000e+00	# [eV]
+       
+		* parameter Eg0:
+		# InAs(x=0)   [0.354 eV]  http://www.ioffe.ru/SVA/NSM/Semicond/InAs/bandstr.html
+		# GaAs(x=1)  [1.424 eV]  http://www.ioffe.ru/SVA/NSM/Semicond/GaAs/bandstr.html
+		# default : Eg0(0)	= 0.355482 # [eV]
+		#		 Eg0(1)	= 1.42248	   # [eV]
+		#		 B(Eg0(1))= 0.555	# [eV]
+		# [1] R.E. Nahory et al in Appl. Phys. Lett. 33 (1978) p. 659
+		# [1] Eg0(x, 300K) = 0.36 + 0.629x + 0.436x^2 ; Eg0(1) = 1.425
+		# [2] Empirical expressions for the alloy composition and 
+		#        temperature dependence of the band gap and intrinsic 
+		#        carrier density in GaxIn1−xAs
+		#  (S.Paul, J.B.Roy, P.K.Basu, J. Appl. Phys., 69, no.2, pp.827-829 (1991).
+		# [2] The following three terms are fitted by Ying-Lun Kao
+		# [2] Eg0(x, 0K) = 0.42 + 0.625x + 0.475x^2 ; Eg0(1) = 1.52
+		# [2] alpha(x) = 4.19e-04 + 1.6e-04 x + 9.943e-07 x^2
+		# [2] beta(x) = 271.1 + 35.64x - 6.799x^2
+		Xmax(0)	= 0.0000e+00	# 
+		Eg0(0)	= 0.42	# [eV] [2]
+		Xmax(1)	= 1	# 
+		Eg0(1)	= 1.520	# [eV] [2]
+		B(Eg0(1))	= 0.475	# [eV] [2]
+		C(Eg0(1))	= 0.0000e+00	# [eV]
+
+		* parameter Bgn2Chi:
+		Xmax(0)	= 0.0000e+00	# [1]
+		Bgn2Chi(0)	= 0.5	# [1]
+		Xmax(1)	= 1	# [1]
+		Bgn2Chi(1)	= 0.5	# [1]
+		B(Bgn2Chi(1))	= 0.0000e+00	# [1]
+		C(Bgn2Chi(1))	= 0.0000e+00	# [1]
+
+		* parameter alpha:
+		Xmax(0)	= 0	# [2]
+		alpha(0)	= 4.19e-04	# [eV/K] # [2] default: 3.3500e-04
+		Xmax(1)	= 1	# [2] 
+		alpha(1)	= 5.80e-04	# [eV/K] # [2] default: 5.4050e-04
+		B(alpha(1))	= 9.943e-07	# [eV/K]
+		C(alpha(1))	= 0.0000e+00	# [eV/K]
+
+		* parameter alpha2:
+		Xmax(0)	= 0.0000e+00	# [1]
+		alpha2(0)	= 0.0000e+00	# [eV/K]
+		Xmax(1)	= 1	# [1]
+		alpha2(1)	= 0.0000e+00	# [eV/K]
+		B(alpha2(1))	= 0.0000e+00	# [eV/K]
+		C(alpha2(1))	= 0.0000e+00	# [eV/K]
+
+		* parameter beta:
+		Xmax(0)	= 0	# [2] default: 0
+		beta(0)	= 2.711e+02	# [K] default: 2.4800e+02
+		Xmax(1)	= 1	# [1]
+		beta(1)	= 3.000e+02	# [K] default: 2.0400e+02
+		B(beta(1))	= -6.799e+00	# [K]
+		C(beta(1))	= 0.0000e+00	# [K]
+
+		* parameter beta2:
+		Xmax(0)	= 0.0000e+00	# [1]
+		beta2(0)	= 0.0000e+00	# [K]
+		Xmax(1)	= 1	# [1]
+		beta2(1)	= 0.0000e+00	# [K]
+		B(beta2(1))	= 0.0000e+00	# [K]
+		C(beta2(1))	= 0.0000e+00	# [K]
+
+		* parameter Chi0:
+		Xmax(0)	= 0.0000e+00	# [1]
+		Chi0(0)	= 4.92751	# [eV]
+		Xmax(1)	= 1	# [1]
+		Chi0(1)	= 4.11826	# [eV]
+		B(Chi0(1))	= 0.0000e+00	# [eV]
+		C(Chi0(1))	= 0.0000e+00	# [eV]
+
+		* parameter WorkFunction:
+		Xmax(0)	= 0.0000e+00	# [1]
+		WorkFunction(0)	= 4.25	# [eV]
+		Xmax(1)	= 1	# [1]
+		WorkFunction(1)	= 4.25	# [eV]
+		B(WorkFunction(1))	= 0.0000e+00	# [eV]
+		C(WorkFunction(1))	= 0.0000e+00	# [eV]
+
+		* parameter FermiEnergy:
+		Xmax(0)	= 0.0000e+00	# [1]
+		FermiEnergy(0)	= 11.7	# [eV]
+		Xmax(1)	= 1	# [1]
+		FermiEnergy(1)	= 11.7	# [eV]
+		B(FermiEnergy(1))	= 0.0000e+00	# [eV]
+		C(FermiEnergy(1))	= 0.0000e+00	# [eV]
+
+		* parameter EgMin:
+		Xmax(0)	= 0.0000e+00	# [1]
+		EgMin(0)	= -1.0000e+01	# [eV]
+		Xmax(1)	= 1	# [1]
+		EgMin(1)	= -1.0000e+01	# [eV]
+		B(EgMin(1))	= 0.0000e+00	# [eV]
+		C(EgMin(1))	= 0.0000e+00	# [eV]
+
+		* parameter dEgMin:
+		Xmax(0)	= 0.0000e+00	# [1]
+		dEgMin(0)	= 0.0000e+00	# [eV]
+		Xmax(1)	= 1	# [1]
+		dEgMin(1)	= 0.0000e+00	# [eV]
+		B(dEgMin(1))	= 0.0000e+00	# [eV]
+		C(dEgMin(1))	= 0.0000e+00	# [eV]
+	}
+	eDOSMass {
+		Formula = 2
+		* me/m0 = (Nc300/2.540e19)^2/3
+		* Nc(T) = Nc300 * (T/300)^3/2
+
+		# Reference: http://www.ioffe.ru/SVA/NSM/Semicond/GaInAs/bandstr.html 
+		*  Nc300 = 2.1e+17  # [cm-3]
+
+		# Reference: Adachi, Properties of Semiconductor Alloys: 
+		# Group-IV, III-V and II-VI Semiconductors, John Wiley & 
+		# Sons, Ltd, 2009.
+		Xmax (0) = 0.0
+		Xmax (1) = 0.1
+		Xmax (2) = 0.2 
+		Xmax (3) = 0.3
+		Xmax (4) = 0.4
+		Xmax (5) = 0.5
+		Xmax (6) = 0.6
+		Xmax (7) = 0.7
+		Xmax (8) = 0.8
+		Xmax (9) = 0.9
+		Xmax (10) = 1.0
+
+		Nc300(0) = 9.3301e+16		#[cm-3]
+		Nc300(1) = 1.1947e+17		#[cm-3]	
+		Nc300(2) = 1.4771e+17		#[cm-3]	
+		Nc300(3) = 1.7787e+17		#[cm-3]	
+		Nc300(4) = 2.0985e+17		#[cm-3]	
+		Nc300(5) = 2.4355e+17		#[cm-3]		
+		Nc300(6) = 2.7888e+17		#[cm-3]		
+		Nc300(7) = 3.1577e+17		#[cm-3]	
+		Nc300(8) = 3.5415e+17		#[cm-3]			
+		Nc300(9) = 3.9398e+17		#[cm-3]	
+		Nc300(10) = 4.3519e+17	#[cm-3] 
+	}
+	hDOSMass {
+		Formula = 2
+		* mh/m0 = (Nv300/2.540e19)^2/3
+		* Nv(T) = Nv300 * (T/300)^3/2
+
+		# Reference: http://www.ioffe.ru/SVA/NSM/Semicond/GaInAs/bandstr.html 
+		* Nv300 = 7.7e+18  # [cm-3]
+
+		# References: 
+		# I. Vurgaftman et al, J. Appl. Phys., vol. 89, no. 11, pp. 5815, 2001.
+		# K. Alavi et al, Phys. Rev. B, vol. 21, no. 3, pp. 1311, 1980.
+		Xmax (0) = 0.0
+		Xmax (1) = 0.1
+		Xmax (2) = 0.2 
+		Xmax (3) = 0.3
+		Xmax (4) = 0.4
+		Xmax (5) = 0.5
+		Xmax (6) = 0.6
+		Xmax (7) = 0.7
+		Xmax (8) = 0.8
+		Xmax (9) = 0.9
+		Xmax (10) = 1.0
+
+		Nv300(0) = 8.4354e+18		#[cm-3] 
+		Nv300(1) = 9.0606e+18		#[cm-3]	
+		Nv300(2) = 9.6191e+18		#[cm-3]	
+		Nv300(3) = 1.0124e+19		#[cm-3]	
+		Nv300(4) = 1.0585e+19		#[cm-3]	
+		Nv300(5) = 1.1011e+19		#[cm-3]		
+		Nv300(6) = 1.1405e+19		#[cm-3]		
+		Nv300(7) = 1.1764e+19		#[cm-3]	
+		Nv300(8) = 1.2076e+19		#[cm-3]			
+		Nv300(9) = 1.2321e+19		#[cm-3]	
+		Nv300(10) = 1.2464e+19	#[cm-3] 
+	} 
+	* Reference: M. Sotoodeh et al., J. Appl. Phys., 
+	# vol. 87, no. 6, pp. 2890, 2000.
+	ConstantMobility
+	{	* mu_const = mumax (T/T0)^(-Exponent)
+
+		Xmax (0) = 0.0
+		Xmax (1) = 0.47
+		Xmax (2) = 1.0
+
+		mumax (0) = 3.4000e+04 ,	530	# [cm^2/(Vs)]
+		mumax (1) = 1.4000e+04 ,	320	# [cm^2/(Vs)]
+		mumax (2) = 9.4000e+03 ,	491.5		# [cm^2/(Vs)]
+		Exponent (0)= 1.57 ,	2.3	# [1]
+		Exponent (1)= 1.59 ,	1.59	# [1]
+		Exponent (2)= 2.1 ,	2.2	# [1]
+	}
+	# InGaAs model
+	HighFieldDependence:
+	{	* Caughey-Thomas model:
+		* mu_highfield = ( (alpha+1)*mu_lowfield ) / 
+		*        ( alpha + ( 1 + ( (alpha+1)*mu_lowfield*E/vsat)^beta )^(1/beta) ) 
+		* beta = beta0 (T/T0)^betaexp.
+		* For vsat either Formula1 or Formula2 can be used.
+		Vsat_Formula	= 1 ,	1	# [1]
+		* Formula2 for saturation velocity:
+		*            vsat = A_vsat - B_vsat*(T/T0)
+		* (Parameter Vsat_Formula has to be equal to 2)
+		* Mole fraction dependent model.
+		* If only constant parameters are specified, those values will be
+		* used for any mole fraction instead of the interpolation below.
+		* Linear interpolation is used on the interval [0,1].
+		beta0(0)	= 2,	2	#[1]
+		beta0(1)	= 2,	2	#[1]
+		betaexp(0)	= 0.0000e+00,	0.0000e+00	#[1]
+		betaexp(1)	= 0.0000e+00,	0.0000e+00	#[1]
+		alpha(0)	= 0.0000e+00,	0.0000e+00	#[1]
+		alpha(1)	= 0.0000e+00,	0.0000e+00	#[1]
+		K_dT(0)	= 0.2,	0.2	#[1]
+		K_dT(1)	= 0.2,	0.2	#[1]
+		E0_TrEf(0)	= 4.0000e+03,	4.0000e+03	#[V/cm]
+		E0_TrEf(1)	= 4.0000e+03,	4.0000e+03	#[V/cm]
+		Ksmooth_TrEf(0)	= 1,	1	#[1]
+		Ksmooth_TrEf(1)	= 1,	1	#[1]
+		vsat0(0)	= 2.09300e+07,	0.714000e+07	#[cm/s]
+		vsat0(1)	= 1.6360e+07,	1.525000e+07	#[cm/s]
+		vsatexp(0)	= 0.0000e+00,	0.0000e+00	#[1]
+		vsatexp(1)	= 0.0000e+00,	0.0000e+00	#[1]
+		A_vsat(0)	= 2.09300e+07,	0.714000e+07	#[cm/s]
+		A_vsat(1)	=1.6360e+07,	1.525000e+07	#[cm/s]
+		B_vsat(0)	= 0,	0.0000e+00	#[cm/s]
+		B_vsat(1)	= 0,	0	#[cm/s]
+		vsat_min(0)	= 0.0000,	0.0000	#[cm/s]
+		vsat_min(1)	= 0,	0	#[cm/s]
+	}
+	# In 0.53 Ga 0.47 As 
+	# Scharfetter Reference : Chiang et al., 
+	# Lateral carrier diffusion and current gain in terahertz 
+	# InGaAs/InP double-heterojunction bipolar transistors (2014)
+	Scharfetter * relation and trap level for SRH recombination:
+	{	* tau = taumin + ( taumax - taumin ) / ( 1 + ( N/Nref )^gamma)
+		* tau(T) = tau * ( (T/300)^Talpha )          (TempDep)
+		* tau(T) = tau * exp( Tcoeff * ((T/300)-1) ) (ExpTempDep)
+		taumin	= 0.0220e-09 ,	0.0100e-09	# [s]
+		taumax	= 0.2500e-09 ,	8.0000e-09	# [s]
+		Nref	= 2.7500e+18 ,	1.7000e+18	# [cm^(-3)]
+		gamma	= 2.50 ,	1.90	# [1]
+		Talpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Tcoeff	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Etrap	= 0.0000e+00	# [eV] 0.157 eV might be reasonable
+	}
+	ThermalDiffusion
+	{ *  Thermal diffusion factor, td: td*mu*kB*N*grad(T), td=0 for Stratton model
+		*  Carrier diffusion factor, td_g: mu*kB*(td_g*Tcarrier + (1-td_g)*Tlattice)*grad(N)
+		td_n	= 0.0000e+00	# [1]
+		td_p	= 0.0000e+00	# [1]
+		td_gn	= 1	# [1]
+		td_gp	= 1	# [1]
+	}
+}
+Material="InP" {
+	Bandgap
+	{ * Eg = Eg0 + alpha Tpar^2 / (beta + Tpar) - alpha T^2 / (beta + T)
+	   * Parameter 'Tpar' specifies the value of lattice 
+	   * temperature, at which parameters below are defined
+	   * Chi0 is electron affinity.
+	   	Chi0	= 4.4	# [eV]
+	   	Eg0	= 1.4200	# [eV]
+	   	alpha	= 3.9800e-04	# [eV K^-1]
+	   	beta	= 1.8919e+02	# [K]
+	   	alpha2	= 0.0000e+00	# [eV K^-1]
+	   	beta2	= 0.0000e+00	# [K]
+	   	EgMin	= -1.0000e+01	# [eV]
+	   	dEgMin	= 0.0000e+00	# [eV]
+	   	Tpar	= 0.0000e+00	# [K]
+	}
+	# Reference : Sotoodeh, M., Khalid, A. H., & Rezazadeh, A. A. (2000). 
+	# Empirical low-field mobility model for III–V compounds applicable in 
+	# device simulation codes. Journal of applied physics, 87(6), 2890-2900.
+	## Only for 300K because their formula are not the same.
+	DopingDependence:
+	{
+  * For doping dependent mobility model three formulas
+  * can be used. Formula1 is based on Masetti et al. approximation.
+  * Formula2 uses approximation, suggested by Arora.
+	formula	= 2 ,	2	# [1]
+  * If formula=2, model suggested by Arora is used:
+  * mu_dop = muminA + mudA/(1.+(N/N00)^AA),
+  * where muminA=Ar_mumin*(T/T0)^Ar_alm; mudA = Ar_mud*(T/T0)^Ar_ald
+  * N is net doping
+  * N00=Ar_N0*(T/T0)^Ar_alN; AA = Ar_a*(T/T0)^Ar_ala
+	Ar_mumin	= 4.0000e+02 ,	1.0000e+01	# [cm^2/Vs]
+	Ar_alm  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_mud  	= 4.8000e+03 ,	1.6000e+02	# [cm^2/Vs]
+	Ar_ald  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_N0   	= 3.0000e+17 ,	4.8900e+17	# [cm^(-3)]
+	Ar_alN  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	Ar_a    	= 4.7000e-01 ,	6.2000e-01	# [1]
+	Ar_ala  	= 0.0000e+00 ,	0.0000e+00	# [1]
+	}
+	# Reference : http://www.ioffe.ru/SVA/NSM/Semicond/InP/basic.html
+	Epsilon
+	{ *  Ratio of the permittivities of material and vacuum
+
+		* epsilon() = epsilon
+		epsilon	= 12.5	
+	}
+	# Reference : http://www.ioffe.ru/SVA/NSM/Semicond/InP/electric.html
+	RadiativeRecombination * coefficients:
+	{ * R_Radiative = C * (T/Tpar)^alpha * (n p - ni_eff^2)
+	   * C
+	   * alpha
+	   	C = 1.2e-10  # [cm^3/s]
+	   	alpha = 0 # []
+	}
+	# Reference : http://www.ioffe.ru/SVA/NSM/Semicond/InP/electric.html
+	Auger * coefficients: (InP)
+	{ * R_Auger = ( C_n n + C_p p ) ( n p - ni_eff^2)
+		* with C_n,p = (A + B (T/T0) + C (T/T0)^2) (1 + H exp(-{n,p}/N0))
+		A	= 9.0000e-31 ,	9.0000e-31	# [cm^6/s]
+		B	= 0.0000e+00 ,	0.0000e+00	# [cm^6/s]
+		C	= 0.0000e+00 ,	0.0000e+00	# [cm^6/s]
+		H	= 0.0000e+00 ,	0.0000e+00	# [1]
+		N0	= 1.0000e+18 ,	1.0000e+18	# [cm^(-3)]
+	}
+	Band2BandTunneling {
+	* Traditional models for the following keywords in input file:
+	* Band2Band(E1)  : A1*E*exp(-B1/E)
+	* Band2Band(E1_5): A1_5*E^1.5*exp(-B1_5/E)
+	* Band2Band(E2)  : A2*E^2*exp(-B2/E)
+	# [1] models_Si.par
+	# [2] Ando1980 Eq.(1), C.B.Duke (1969) Eq.(13.1), John L. Moll (1970) Eq.(12-53)
+		A1	= 1.1000e+27	# [1/cm^2/sec/V]	[1]
+		B1	= 2.1300e+07	# [V/cm]	[1]
+		A1_5= 1.9000e+24	# [1/cm^1.5/sec/V^1.5]	[1]
+		B1_5= 2.1900e+07	# [V/cm]	[1]
+		A2	= 9.147e+19	# [1/cm/sec/V^2] [2] # 1.446e+20
+		B2	= 2.13e+7		# [V/cm] [2]
+	
+	  * Hurkx model for the following keywords in input file:
+	  * Band2Band(Hurkx)  : -Agen*D*(E/E0)^Pgen*exp(-Bgen*(Eg/Eg300)^1.5/E) if D < 0
+	  *                     -Arec*D*(E/E0)^Prec*exp(-Brec*(Eg/Eg300)^1.5/E) if D > 0
+	  *                     D = (n*p-ni^2)/(n+ni)/(p+ni)*(1-|alpha|)+alpha, E0 = 1 V/cm
+	  *                     So, if alpha = 0, it's original Hurkx model,
+	  *                         if alpha = -1, it's only generation,
+	  *                         if alpha = +1, it's only recombination.
+	  	Agen = 9.147e+19	# [1/cm^3/sec] ; Default 1.785e+20
+		Bgen = 2.13e+7	# [V/cm] ; Default 6.188e+6
+		Pgen = 2	# [1] ; Default 2
+		Arec	= 9.147e+19	# [1/cm^3/sec]
+		Brec	= 2.13e+7		# [V/cm]
+		Prec	= 2	# [ 1]
+		alpha= 0.0000e+00	# [1]
+		
+	 * nonlocal B2B models for the following keywords in command file:
+	 * Band2Band(Model=NonlocalPath) : Nonlocal B2B tunneling with transition process using the tunneling path
+	 * For the nonlocal B2B process:
+	 * Apath : Prefactor Ad or Ap in the uniform field limit for the direct or indirect tunneling
+	 * Bpath : Exponent  Bd or Bp in the uniform field limit for the direct or indirect tunneling
+	 * Cpath : Factor g*Dop^2/rho for indirect tunneling
+	 * Dpath : The conduction band offset D
+	 * Ppath : The phonon energy P
+	 *         Note that the indirect tunneling process is assumed if P>0, and the direct tunneling process is assumed if P=0
+	 * Rpath : The ratio mv/mc. If Rpathi=0, it is automatically determined by
+	 *         mv/mc = (1 + 2*mr)/(1 - 2*mr)
+	 *         where mr=mc*mv/(mc+mv) is the reduced mass
+	 * g     : Degeneracy factor
+	 * m_c   : Effective mass in the conduction band
+	 * m_v   : Effective mass in the valence band
+	 * In the uniform field limit, the generation rate can be expressed by
+	 * G = A * (F/F0)^2   * Exp(-B/F) for   direct tunneling
+	 *   = A * (F/F0)^2.5 * Exp(-B/F) for indirect tunneling
+	 * where
+	 * Ad = g * mr^0.5 * (qF0)^2 / (36 * pi * h_bar^2 *E_T^0.5)
+	 * Ap = g *(mc*mv)^1.5 * (1+2*N) * (qF0)^2.5 * Dop^2 / (2^7.75 * pi^2.5 * h_bar^2.5 * mr^1.25 * E_T^1.75 * rho * P)
+	 * Bd = pi    * mr^0.5 * E_T^1.5 / (2 * h_bar * q)
+	 * Bp = 2^2.5 * mr^0.5 * E_T^1.5 / (3 * h_bar * q)
+	 * F0 = 1 V/cm, qF0 = 1 eV/cm, E_T = E_G + D
+	 * For the paramter set (APath, Bpath, Dpath, Ppath, Rpath), the microscopic parameters such as mr, mc, and mv for the nonlocal B2B model are extracted internally.   * For the parameter set (Cpath, g, m_c, m_v), the microscopic parameters are used directly for the tunneling rate computation.
+  		APath=1.81e+20
+		BPath=5.866e+6
+		DPath=0
+		PPath = 0
+		RPath =  1.27
+		
+	* Unknown model parameters
+		APath2=1.81e+20
+		BPath2=5.866e+6
+		DPath2=0
+		PPath2 = 0
+		RPath2 = 1.27
+	}
+    	# Reference of mt value
+    	# Hurkx et al., "A New Recombination Model for Device Simulation
+    	# Including Tunneling", 1992.
+    	# The mt value depends on experiment. 
+    	# According to Hurkx(1992), mt = 0.25 seems plausible.
+    	HurkxTrapAssistedTunneling {
+    		mt=0.25,0.25
+    	}
+    	* Unknown Source [2012.06]
+	HighFieldDependence:{ 
+		* Caughey-Thomas model:
+		* mu_highfield = ( (alpha+1)*mu_lowfield ) / 
+		*        ( alpha + ( 1 + ( (alpha+1)*mu_lowfield*E/vsat)^beta )^(1/beta) ) 
+		* beta = beta0 (T/T0)^betaexp.
+		beta0	= 2 ,	2	# [1]
+		betaexp	= 0.0000e+00 ,	0.0000e+00	# [1]
+		alpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+
+		* Smoothing parameter for HydroHighField Caughey-Thomas model:
+		* if Tl < Tc < (1+K_dT)*Tl, then smoothing between low field mobility
+		* and HydroHighField mobility is used.
+		K_dT	= 0.2 ,	0.2	# [1]
+		* Transferred-Electron Effect:
+		* mu_highfield = (mu_lowfield+(vsat/E)*(E/E0_TrEf)^4)/(1+(E/E0_TrEf)^4)
+		E0_TrEf	= 4.0000e+03 ,	4.0000e+03	# [1]
+		Ksmooth_TrEf	= 20,	20	# [1][2016  sdevice_ug.pdf]
+
+		* For vsat either Formula1 or Formula2 can be used.
+		# Reference: T Gonzalez Sanchez et al. 1992 Semicond. Sci. Technol. 7 31
+		# "Electron transport in InP under high electric field conditions
+		Vsat_Formula	= 1 ,	1	# [1]
+		vsat0	= 0.75e+07,	0.800e+07	#[cm/s][T G. Sanchez, et al. 1992]
+		vsatexp	= 0.0000e+00,	0.0000e+00	# Temperature-independent assumption for 300-700kV/cm
+		* Formula2 for saturation velocity:
+		*            vsat = A_vsat - B_vsat*(T/T0)
+		* (Parameter Vsat_Formula has to be equal to 2)
+		A_vsat	= 1.0000e+07 ,	0.8000e+07	# [1]
+		B_vsat	= 0.0000e+00 ,	0.0000e+00	# [1]
+		vsat_min	= 5.0000e+05 ,	5.0000e+05	# [1]
+		
+		# Another temperature-dependent model for the saturation
+		# velocity is "R.Quay, C. Moglestue, V. Palankovski, and S. Selberherr
+		# "A temperature dependent model for the saturation velocity
+		# in semiconductor materials" Materials Science in Semiconductor
+		# Processing, vol. 3, no. 1-2, pp. 149-155, 2000.
+	}
+	# Capasso 1985 InP Impact ionization coefficients
+	vanOverstraetendeMan * Impact Ionization:
+	{	* G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+		* with alpha = gamma a  exp(-b gamma/E) for E<E0 (low) and E>E0 (high)
+		*  with gamma = tanh(hbarOmega/(2kT0)) / tanh(hbarOmega/(2kT))
+		a(low)	= 11.2000e+06 ,	4.79000e+06	# [1/cm]
+		a(high)	= 2.93000e+06 ,	1.62000e+06	# [1/cm]
+		b(low)	= 3.11000e+06 ,2.55000e+06	# [V/cm]
+		b(high)	= 2.64000e+06 ,	2.110e+06	# [V/cm]
+		E0	= 3.8000e+05 ,	3.8000e+05	# [V/cm]
+		hbarOmega	= 0.063 ,	0.063	# [eV]
+	}
+	OkutoCrowell * Impact Ionization:
+	{ * G_impact = alpha_n n v_drift_n  +  alpha_p p v_drift_p
+	   * with alpha = a (1+c(T-300)) E^gamma exp[-(Ecrit (1+d(T-300)) /E )^delta]
+	   * and Ecrit = b (default),
+	   * or  Ecrit = (beta Eg)/(q lambda) (with BandgapDependence)
+	   # [1] Fitted from Taguchi (1985) formula by Ying-Lun Kao
+	   	a	= 0.2885 ,	4.6632	# [1/V] [1]
+	   	b	= 9.7885e+05 ,	9.1762e+05	# [V/cm] [1]
+	   	c	= 3.2237e-04 ,	3.7237e-04	# [1/K] [1]
+	   	d	= 9.1731e-04 ,	1.0244e-03	# [1/K] [1]
+	   	gamma	= 1.052 ,	0.8623	# [-] [1]
+	   	delta	= 1.8 ,	1.8149	# [-] [1]
+	   	beta	= 0.265283 ,	0.261395	# [-] [Silicon]
+	   	lambda	= 6.2000e-07 ,	4.5000e-07	# [cm] [Silicon]
+	}
+	# Landis, G. A., Jenkins, P., & Weinberg, I. (1991, April). 
+	# Photoluminescence lifetime measurements in InP wafers. 
+	# In Indium Phosphide and Related Materials, 1991., 
+	# Third International Conference. (pp. 636-639). IEEE.
+	Scharfetter * relation and trap level for SRH recombination:
+	{	* tau = taumin + ( taumax - taumin ) / ( 1 + ( N/Nref )^gamma)
+		* tau(T) = tau * ( (T/300)^Talpha )          (TempDep)
+		* tau(T) = tau * exp( Tcoeff * ((T/300)-1) ) (ExpTempDep)
+		taumin	= 9.00e-9 ,	1.50e-9	# [s]
+		taumax	= 3.15e-7 ,	5.50e-7	# [s]
+		Nref	= 3.7000e+17 ,	4.0000e+15	# [cm^(-3)]
+		gamma	= 1.7 ,	2.2	# [1]
+		Talpha	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Tcoeff	= 0.0000e+00 ,	0.0000e+00	# [1]
+		Etrap	= 0.336795e+00	# [eV]
+	}
+	ThermalDiffusion
+	{ *  Thermal diffusion factor, td: td*mu*kB*N*grad(T), td=0 for Stratton model
+		*  Carrier diffusion factor, td_g: mu*kB*(td_g*Tcarrier + (1-td_g)*Tlattice)*grad(N)
+		td_n	= 0.0000e+00	# [1]
+		td_p	= 0.0000e+00	# [1]
+		td_gn	= 1	# [1]
+		td_gp	= 1	# [1]
+	}
+}
